@@ -10,6 +10,10 @@
   <style>
     .note-header{grid-template-columns:1.1fr 1.55fr .5fr .62fr}.brand-image{width:100%;max-width:265px;height:auto;object-fit:contain}.qr-code{width:100%;max-width:115px;aspect-ratio:1;object-fit:contain;justify-self:center}.warranty-header .brand-image{width:225px;max-width:48%;height:auto;object-fit:contain;margin:6px 0 0 12px}
   </style>
+  <style id="print-page-style"></style>
+  <style>
+    @media print{.note-sheet{width:100%!important;height:auto!important;max-width:none!important;aspect-ratio:1080/763!important;break-after:auto!important;page-break-after:auto!important}.warranty-sheet{width:100%!important;min-height:0!important;max-width:none!important;aspect-ratio:579.36/795.36!important}}
+  </style>
 </head>
 <body>
 <main class="app">
@@ -36,7 +40,7 @@ function preview(){const stage=document.getElementById('stage');stage.innerHTML=
 function render(){document.getElementById('editor').innerHTML=active==='note'?noteEditor():warrantyEditor();preview();document.getElementById('preview-name').textContent=active==='note'?'Nota de venta':'Carta de garantía';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===active));}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b){active=b.dataset.tab;render()}if(e.target.id==='add-item'){state.note.items.push({id:Date.now(),quantity:1,description:'',unitPrice:0});render()}const r=e.target.closest('[data-remove]');if(r){state.note.items=state.note.items.filter(i=>i.id!=r.dataset.remove);render()}});
 document.addEventListener('input',e=>{const t=e.target;if(!t.dataset.key)return;if(t.dataset.item){const item=state.note.items.find(i=>i.id==t.dataset.item);item[t.dataset.key]=['quantity','unitPrice'].includes(t.dataset.key)?Number(t.value):t.value}else{state[t.dataset.group][t.dataset.key]=t.value}preview();if(active==='note'&&t.dataset.item)document.querySelector('.total b').textContent=money(state.note.items.reduce((s,i)=>s+(+i.quantity||0)*(+i.unitPrice||0),0))});
-document.getElementById('save').onclick=()=>{localStorage.setItem('jagra-documentos',JSON.stringify(state));const b=document.getElementById('save');b.textContent='Guardado en este equipo';setTimeout(()=>b.textContent='Guardar datos',2200)};document.getElementById('print').onclick=()=>print();document.getElementById('print-small').onclick=()=>print();render();
+function printDocument(){document.getElementById('print-page-style').textContent=`@page{size:${active==='note'?'landscape':'portrait'};margin:0}`;window.print()}document.getElementById('save').onclick=()=>{localStorage.setItem('jagra-documentos',JSON.stringify(state));const b=document.getElementById('save');b.textContent='Guardado en este equipo';setTimeout(()=>b.textContent='Guardar datos',2200)};document.getElementById('print').onclick=printDocument;document.getElementById('print-small').onclick=printDocument;render();
 </script>
 </body>
 </html>
